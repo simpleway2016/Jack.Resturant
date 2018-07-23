@@ -1,0 +1,10 @@
+﻿{
+  "cmd": "order.status.push",
+  "timestamp": "1528967169",
+  "version": "3",
+  "ticket": "36D486E3-7CF5-B176-A687-D6CC3571CC7C",
+  "source": "32517",
+  "body": "{\"order_id\":\"15289656179813\",\"status\":9}",
+  "sign": "1089C00C8D8EBA12464B24247BA63F8D",
+  "encrypt": ""
+}

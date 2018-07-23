@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        #title {
+            height: 44px;
+            color: white;
+            font-size: 17px;
+            text-align: center;
+            background-color: #20a1ff;
+           
+            padding-top:8px;
+        }
+        div {
+            box-sizing: border-box;
+        }
+        .texttitle {
+            display: table-cell;
+            text-align: center;
+            height:31px;
+            min-width: 280px;
+            padding-top: 12px;
+            font-size: 16px;
+
+            color: #888888;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .btn {
+            display:table-cell;
+            text-align:center;
+            height: 51px;
+            min-width: 280px;
+            border-radius: 6px;
+            padding-top: 12px;
+            font-size:16px;
+            border: 1px solid #cad3da;
+            background-color: #f1f5f8;
+            color: #888888;
+            padding-left:5px;
+            padding-right:5px;
+            cursor:pointer;
+        }
+            .btn[clicked='1'] {
+                background-color: #e08e00;
+                color: #fff;
+            }
+            .btn[actived='1'] {
+                background-color: #4cb142;
+                color: #fff;
+            }
+        .ele_btn {
+            
+        }
+        .split {
+            display: table-cell;
+            width: 100px;
+            text-align: center;
+            color: #2a8e0c;
+            visibility: hidden;
+        }
+            .split[actived='1'] {
+               cursor:pointer;
+                visibility :visible;
+            }
+        .btnOK {
+            height: 60px;
+            width: 100%;
+            color: white;
+            font-size: 19px;
+            padding-top: 16px;
+            border-radius: 6px;
+            background-color: #20a1ff;
+            margin-top:50px;
+            cursor:pointer;
+        }
+
+        .store {
+            font-size: 16px;
+            color: #000;
+            line-height: 26px;
+            cursor: pointer;
+        }
+
+            .store[mapped='1'] {
+                color:green;
+                font-weight:bold;
+            }
+
+        #divContent {
+            padding: 8px;
+            border: 1px solid #808080;
+            border-radius: 5px;
+            display: table-cell;
+        }
+        #divEleContent {
+            padding: 8px;
+            border: 1px solid #808080;
+            border-radius: 5px;
+            display: table-cell;
+            visibility:hidden;
+        }
+       
+        .box_1{
+            text-align:center;
+        }
+        .box_2{
+            display:inline-block;
+            min-width:633px;
+            height:50px;
+            background:#ccc;
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" method="post">
+        <input type="hidden" name="pairValue" id="pairValue"/>
+        <input type="hidden" name="token" id="token" />
+        <input type="hidden" name="refresh_token" id="refresh_token" />
+        <input type="hidden" name="expires_in" id="expires_in" />
+    </form>
+    <div class="box_1">
+        <div class="box_2">
+            <div id="container" style="width:100%;background-color:#fff;text-align:left;">
+                <div id="title">请点击需要绑定的门店</div>
+                <div style="display:table-row;">
+                    <div class="texttitle">需绑定的门店</div>
+                    <div class="split"></div>
+                    <div class="texttitle">饿了么门店</div>
+                </div>
+
+                <div id="BindDiv"></div>
+                <div id="unBindDiv"></div>
+                
+                <!--
+                <div style="height:30px;"></div>
+                <div style="display:table-row;">
+                    <div class="btn">我的门店</div>
+                    <div class="split"></div>
+                    <div class="btn ele_btn">我的门店</div>
+                </div>-->
+            </div>
+            <div class="btnOK" onclick="btnOk_click()">确定</div>
+        </div>
+    </div>
+
+    <script lang="ja">
+        var sys_shops = [
+            { id: 1, Name: "我的店1" },
+            { id: 2, Name: "我的店2" }
+        ];
+        var ele_shops = [
+            { id: 11, Name: "饿了么店1" },
+            { id: 12, Name: "饿了么店2" }
+        ];
+
+        var curSelectedShop;
+        function showAllEle()
+        {
+            for (var i = 0; i < eleShopList.length; i++) {
+                eleShopList[i].show();
+            }
+        }
+
+
+        function Shop(data,isEle)
+        {
+            var self = this;
+            var divEle = document.createElement("DIV");
+            divEle.className = "btn";
+            divEle.innerHTML = data.Name;
+            this.element = divEle;
+            if (data.Name) {
+                divEle.onclick = function () {
+                    if (divEle.getAttribute("actived") == "1")//已经绑定，忽略
+                        return;
+
+                    if (!isEle) {
+                        for (var i = 0; i < shopList.length; i++) {
+                            if (shopList[i] != self) {
+                                shopList[i].element.setAttribute("clicked", "");
+                            }
+                        }
+                        divEle.setAttribute("clicked", "1");
+                        showAllEle();
+                        curSelectedShop = self;
+                    }
+                    else {
+                        //点击饿了么
+                        var pairIndex = unPairList.indexOf(self.Pair);
+                        var nextEleShopIndex = -1;
+                        for (var i = pairIndex + 1; i < unPairList.length; i++)
+                        {
+                            if (unPairList[i].eleShop)
+                            {
+                                nextEleShopIndex = i;
+                                break;
+                            }
+                        }
+                        unPairList[pairIndex].removeEleShop();
+                        if (nextEleShopIndex >= 0)
+                        {
+                            var fillindex = pairIndex;
+                            for (var i = nextEleShopIndex; i < unPairList.length; i++) {
+                                if (unPairList[i].eleShop) {
+                                    var eleshop = unPairList[i].eleShop;
+                                    unPairList[i].removeEleShop();
+                                    unPairList[fillindex].setEleShop(eleshop);
+                                    fillindex++;
+                                }
+                            }
+                        }
+                        //移除shop，后面的要往上挪
+                        pairIndex = unPairList.indexOf(curSelectedShop.Pair);
+                        var nextShopIndex = -1;
+                        for (var i = pairIndex + 1; i < unPairList.length; i++) {
+                            if (unPairList[i].shop) {
+                                nextShopIndex = i;
+                                break;
+                            }
+                        }
+                        unPairList[pairIndex].removeShop();
+                        if (nextShopIndex >= 0) {
+                            var fillindex = pairIndex;
+                            for (var i = nextShopIndex; i < unPairList.length; i++) {
+                                if (unPairList[i].shop) {
+                                    var shop = unPairList[i].shop;
+                                    unPairList[i].removeShop();
+                                    unPairList[fillindex].setShop(shop);
+                                    fillindex++;
+                                }
+                            }
+                        }
+                        for (var i = 0; i < unPairList.length; i++)
+                        {
+                            if (!unPairList[i].shop)
+                            {
+                                unPairList[i].setShop(new Shop({},false));
+                            }
+                        }
+
+                        var pair = new Pair(bindedContainer, curSelectedShop, self);
+                        pairList.push(pair);
+                        pair.active();
+
+                        //移除空行
+                        for (var i = 0; i < unPairList.length; i++) {
+                            if (unPairList[i].delMeIf()) {
+                                i--;
+                            }
+                        }
+                        for (var i = 0; i < unPairList.length; i++) {
+                            if (unPairList[i].eleShop) {
+                                unPairList[i].eleShop.hide();
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                divEle.style.visibility = "hidden";
+            }
+            
+            this.id = data.id;
+            this.Pair = null;
+
+            this.hide = function ()
+            {
+                divEle.style.visibility = "hidden";
+            }
+            this.show = function ()
+            {
+                divEle.style.visibility = "visible";
+            }
+        }
+
+        function Pair(parent,shop,eleShop)
+        {
+            var self = this;
+            var divnone = document.createElement("DIV");
+            divnone.style.height = "30px";
+            divnone.style.display = "table-row";
+            parent.appendChild(divnone);
+
+            var divRow = document.createElement("DIV");
+            divRow.style.display = "table-row";
+            parent.appendChild(divRow);
+            divRow.appendChild(shop.element);
+
+            var divSplit = document.createElement("DIV");
+            divSplit.className = "split";
+            divSplit.innerHTML = "--<font color='red'>XX</font>--&gt;";
+            divRow.appendChild(divSplit);
+
+            if (eleShop) {
+                divRow.appendChild(eleShop.element);
+               
+            }
+
+            eleShop.Pair = self;
+            shop.Pair = self;
+
+            this.isPaired = false;
+            this.shop = shop;
+            this.eleShop = eleShop;
+
+            this.moveToFirst = function ()
+            {
+                if (divnone != parent.children[0])
+                {
+                    var root = parent.children[0];
+                    parent.insertBefore(divnone, root);
+                    parent.insertBefore(divRow, root);
+                }
+            }
+
+            this.active = function ()
+            {
+                self.isPaired = true;
+                self.shop.element.setAttribute("actived", "1");
+                self.eleShop.element.setAttribute("actived", "1");
+                divSplit.setAttribute("actived", "1");
+                divSplit.title = "解除绑定";
+                divSplit.onclick = function ()
+                {
+                    var index = pairList.indexOf(self);
+                    pairList.splice(index, 1);
+
+                    parent.removeChild(divnone);
+                    parent.removeChild(divRow);
+
+                    self.shop.element.setAttribute("actived", "");
+                    self.shop.element.setAttribute("clicked", "");
+                    self.eleShop.element.setAttribute("actived", "");
+
+                    var pair = new Pair(container, self.shop, self.eleShop);
+                    unPairList.push(pair);
+                    pair.moveToFirst();
+                }
+            }
+
+            this.delMeIf = function () {
+                if (!self.eleShop) {
+                    if (!self.shop || !self.shop.id) {
+                        //可以移除
+                        parent.removeChild(divnone);
+                        parent.removeChild(divRow);
+                        var list = unPairList;
+                        if (self.isPaired) {
+                            list = pairList;
+                        }
+                        var index = list.indexOf(self);
+                        list.splice(index, 1);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            this.removeEleShop = function ()
+            {
+                if (self.eleShop)
+                {
+                    divRow.removeChild(self.eleShop.element);
+                    self.eleShop.Pair = null;
+                    self.eleShop = null;
+
+                    
+                }
+            }
+            this.setEleShop = function (ele)
+            {
+                self.eleShop = ele;
+                divRow.appendChild(self.eleShop.element);
+                self.eleShop.Pair = self;
+            }
+            this.removeShop = function () {
+                if (self.shop) {
+                    divRow.removeChild(self.shop.element);
+                    self.shop.Pair = null;
+                    self.shop = null;
+                }
+            }
+            this.setShop = function (shop) {
+                self.shop = shop;
+                divRow.insertBefore(self.shop.element, divSplit);
+                self.shop.Pair = self;
+            }
+        }
+
+        function btnOk_click()
+        {
+            var result = "";
+            for (var i = 0; i < pairList.length; i++)
+            {
+                result += pairList[i].shop.id + "_" + pairList[i].eleShop.id + ",";
+            }
+
+            document.querySelector("#pairValue").value = result;
+            document.querySelector("#form1").submit();
+        }
+
+        var shopList = [];
+        var eleShopList = [];
+        var unPairList = [];
+        var pairList = [];
+
+        var container = document.body.querySelector("#unBindDiv");
+        var bindedContainer = document.body.querySelector("#BindDiv");
+        window.onload = function ()
+        {
+            var len = Math.max(sys_shops.length, ele_shops.length );
+            for (var i = 0; i < len; i++)
+            {
+                var shop = null;
+                var eleShop = null; 
+                if (i < sys_shops.length) {
+                    shop = new Shop(sys_shops[i],false);
+                    shopList.push(shop);
+                }
+                else {
+                    shop = new Shop({});
+                }
+
+                if (i < ele_shops.length) {
+                    eleShop = new Shop(ele_shops[i],true);
+                    eleShopList.push(eleShop);
+                }
+
+                unPairList.push(new Pair(container ,  shop, eleShop));
+            }
+
+            for (var i = 0; i < eleShopList.length; i++)
+            {
+                eleShopList[i].hide();
+            }
+        }
+    </script>
+</body>
+</html>

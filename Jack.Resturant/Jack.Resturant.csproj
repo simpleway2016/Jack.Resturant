@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>北京小恒科技发展有限公司</Company>
+    <Authors>Jack</Authors>
+    <Version>1.0.7.0</Version>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <FileVersion>1.0.7.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\Jack.Resturant.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Jack.Resturant.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc">
+      <Version>2.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Impls\Ele\ReleaseStoreMap.html" />
+    <None Remove="Impls\Ele\StoreMap.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Impls\Ele\ReleaseStoreMap.html" />
+    <EmbeddedResource Include="Impls\Ele\StoreMapSuccess.html" />
+    <EmbeddedResource Include="Impls\Ele\StoreMap.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jack.HttpRequestHandlers" Version="1.0.2.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
+    <PackageReference Include="Way.Lib" Version="2.0.2.5" />
+  </ItemGroup>
+
+</Project>

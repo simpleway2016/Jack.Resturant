@@ -1,0 +1,10 @@
+﻿{
+  "requestId": "100011058693285649",
+  "type": 18,
+  "appId": 62862354,
+  "message": "{\"orderId\":\"1217326493714813124\",\"state\":\"settled\",\"shopId\":161801806,\"updateTime\":1520401425,\"role\":9}",
+  "shopId": 161801806,
+  "timestamp": 1520401425718,
+  "signature": "58289B874A08EA377AA1F91E9ED764E1",
+  "userId": 269991755818040846
+}
